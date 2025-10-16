@@ -21,6 +21,18 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-REL_PATH="${PWD#$MOUNT_SRC}"
-REL_PATH="${REL_PATH#/}"
-docker exec -it "$CONTAINER" php "$@" "$CONTAINER_ROOT/$REL_PATH"
+TARGET_FILE="$1"
+shift
+
+if [ -z "$TARGET_FILE" ]; then
+  echo "ERROR: No target file specified" >&2
+  exit 1
+fi
+
+if [[ "$TARGET_FILE" != /* ]]; then
+  TARGET_FILE="$REPO_ROOT/$TARGET_FILE"
+fi
+
+CONTAINER_PATH="$CONTAINER_ROOT${TARGET_FILE#$MOUNT_SRC}"
+
+docker exec -it "$CONTAINER" php "$CONTAINER_PATH" "$@"
