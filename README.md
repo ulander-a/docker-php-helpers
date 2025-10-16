@@ -18,6 +18,6 @@ Run the scripts (i.e. `docker-php`) from inside a repository and it will attempt
 
 *Examples:*
 
-1. Run "reset password" CLI script `docker-php server/admin/cli/reset_password.php`.
-2. Run PHP Code Sniffer on a file/dir: `docker-phpcs server/local/path/to/dir/`.
-3. Run PHP Code Beautifier and Fixer on a file/dir: `docker-phpcs server/local/path/to/file.php`.
+1. Run "reset password" CLI script `docker-php server/admin/cli/reset_password.php`
+2. Run PHP Code Sniffer on a file/dir: `docker-phpcs server/local/path/to/dir/`
+3. Run PHP Code Beautifier and Fixer on a file/dir: `docker-phpcbf server/local/path/to/file.php`

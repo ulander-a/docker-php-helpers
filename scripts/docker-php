@@ -22,12 +22,14 @@ if [ $? -ne 0 ]; then
 fi
 
 TARGET_FILE="$1"
-shift
 
-if [ -z "$TARGET_FILE" ]; then
-  echo "ERROR: No target file specified" >&2
-  exit 1
+# If no args or first arg is a flag, pass everything through
+if [ -z "$TARGET_FILE" ] || [[ "$TARGET_FILE" == -* ]]; then
+  docker exec -it "$CONTAINER" php "$@"
+  exit 0
 fi
+
+shift
 
 if [[ "$TARGET_FILE" != /* ]]; then
   TARGET_FILE="$REPO_ROOT/$TARGET_FILE"
