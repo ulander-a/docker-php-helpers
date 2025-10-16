@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# docker-common - Shared helper functions for docker tools
+
+find_repo_root() {
+  local current_dir=$(pwd)
+  while [ "$current_dir" != "/" ]; do
+    if [ -f "$current_dir/.gitlab-ci.yml" ]; then
+      echo "$current_dir"
+      return 0
+    fi
+    current_dir=$(dirname "$current_dir")
+  done
+  return 1
+}
+
+get_container_for_image() {
+  local php_image="$1"
+  case "$php_image" in
+    *php-7.4*) echo "xts_php74" ;;
+    *php-8.2*) echo "xts_php82" ;;
+    *php-8.3*) echo "xts_php83" ;;
+    *php-8.4*) echo "xts_php84" ;;
+    *) return 1 ;;
+  esac
+}
+
+detect_container() {
+  local repo_root="$1"
+  local php_image_line=$(grep -E '^\s*image:' "$repo_root/.gitlab-ci.yml" | head -n1 | sed 's/^\s*image:\s*//')
+  
+  if [ -z "$php_image_line" ]; then
+    echo "ERROR: Could not find 'image:' line in $repo_root/.gitlab-ci.yml" >&2
+    return 1
+  fi
+  
+  local php_image=$(eval echo "$php_image_line")
+  
+  local container=$(get_container_for_image "$php_image")
+  if [ -z "$container" ]; then
+    echo "ERROR: No container mapping for image: $php_image" >&2
+    return 1
+  fi
+  echo "$container"
+}
+
+verify_container_running() {
+  local container="$1"
+  if ! docker ps --format '{{.Names}}' | grep -q "^$container\$"; then
+    echo "ERROR: Container $container is not running. Please start your dev containers first." >&2
+    return 1
+  fi
+}

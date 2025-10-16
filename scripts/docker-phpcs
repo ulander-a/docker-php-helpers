@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# docker-phpcs - Run PHPCS from project root vendor/bin
+source /usr/local/bin/docker-common
+
+MOUNT_SRC="$HOME/Code/src"
+CONTAINER_ROOT="/var/www/src"
+
+REPO_ROOT=$(find_repo_root)
+if [ $? -ne 0 ]; then
+  CURRENT_PWD=$(pwd)
+  echo "ERROR: Could not find .gitlab-ci.yml in $CURRENT_PWD" >&2
+  exit 1
+fi
+
+CONTAINER=$(detect_container "$REPO_ROOT")
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+verify_container_running "$CONTAINER"
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+TARGET_FILE="$1"
+shift
+
+if [ -z "$TARGET_FILE" ]; then
+  echo "ERROR: No target file specified" >&2
+  exit 1
+fi
+
+if [[ "$TARGET_FILE" != /* ]]; then
+  TARGET_FILE="$REPO_ROOT/$TARGET_FILE"
+fi
+
+REL_PATH="${TARGET_FILE#$MOUNT_SRC}"
+REL_PATH="${REL_PATH#/}"
+
+docker exec -it "$CONTAINER" "$CONTAINER_ROOT/vendor/bin/phpcs" "$CONTAINER_ROOT/$REL_PATH" "$@"

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# docker-php - Run PHP in the container that matches .gitlab-ci.yml
+source /usr/local/bin/docker-common
+
+MOUNT_SRC="$HOME/Code/src"
+CONTAINER_ROOT="/var/www/src"
+
+REPO_ROOT=$(find_repo_root)
+if [ $? -ne 0 ]; then
+  echo "ERROR: Could not find .gitlab-ci.yml in any parent directory" >&2
+  exit 1
+fi
+
+CONTAINER=$(detect_container "$REPO_ROOT")
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+verify_container_running "$CONTAINER"
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+REL_PATH="${PWD#$MOUNT_SRC}"
+REL_PATH="${REL_PATH#/}"
+docker exec -it "$CONTAINER" php "$@" "$CONTAINER_ROOT/$REL_PATH"
