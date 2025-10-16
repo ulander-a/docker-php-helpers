@@ -16,7 +16,7 @@ This is a set of bash scripts made to simplify the management and usage of PHP c
 
 Run the scripts (i.e. `docker-php`) from inside a repository and it will attempt to automatically detect the PHP version from the *.gitlab-ci.yml* (subject to change) and find the matching docker container.
 
-*Examples:*
+**Examples:**
 
 1. Run "reset password" CLI script `docker-php server/admin/cli/reset_password.php`
 2. Run PHP Code Sniffer on a file/dir: `docker-phpcs server/local/path/to/dir/`
